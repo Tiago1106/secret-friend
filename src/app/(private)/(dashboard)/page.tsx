@@ -8,10 +8,14 @@ import { useRouter } from "next/navigation";
 export default function Dashboard() {
   const router = useRouter()
   
-  const { data, isLoading, error } = useGroups();
+  const { data, isLoading, isError } = useGroups();
 
   if (isLoading) return <p>Carregando...</p>;
-  if (error) return <p>Erro ao carregar grupos</p>;
+  if (isError) return <p>Erro ao carregar grupos</p>;
+
+  const handleClickGroup = (id: string) => {
+    router.push(`group/${id}`)
+  }
 
   return (
     <div className="flex flex-col gap-5">
@@ -28,7 +32,7 @@ export default function Dashboard() {
         lg:grid-cols-3
         xl:grid-cols-4">
         {data?.map((item) => (
-          <CustomCard key={item.id} date={item.date} participants={item.participants} title={item.title} />
+          <CustomCard key={item.id} id={item.id} date={item.date} participants={item.participants} title={item.title} onClick={handleClickGroup}/>
         ))}
       </div>
     </div>

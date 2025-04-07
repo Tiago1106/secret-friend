@@ -88,7 +88,7 @@ export default function NewGroup() {
 
   return (
     <div className="item-center justify-center flex">
-      <Card className="max-w-[600px] border rounded-md bg-accent cursor-pointer px-0 w-full">
+      <Card className="max-w-[600px] border rounded-md px-0 w-full">
         <CardHeader>
           <CardTitle>Novo Grupo</CardTitle>
           <CardDescription>Convide seus amigos para participar</CardDescription>
