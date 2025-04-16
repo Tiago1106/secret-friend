@@ -1,4 +1,4 @@
-import api from "../api";
+import api from "@/helpers/api";
 
 export const setAuthToken = async (token: string) => {
   await api.post("auth/set-token", { json: { token } });

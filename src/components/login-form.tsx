@@ -24,9 +24,11 @@ import { toast } from "sonner";
 import { z } from "zod"
 import { ZodError } from "zod"
 import { useState } from "react"
-import { setAuthToken } from "@/helpers/auth/authCookies"
+import { setAuthToken } from "@/lib/auth/authCookies"
 import { useRouter } from "next/navigation"
-
+import { signInWithFirebase } from "@/lib/auth/auth"
+import { Spinner } from "./ui/spinner"
+import { registerUser } from "@/lib/auth/register"
 const loginSchema = z.object({
   email: z.string().email("Email inválido").nonempty("Email é obrigatório"),
   password: z.string().nonempty("Senha é obrigatória"),
@@ -45,14 +47,16 @@ type LoginFormValues = {
 type RegisterFormValues = {
   email: string
   password: string
+  name: string
 }
 
 type FormErrors = {
   email?: string
   password?: string
+  name?: string
 }
 
-const ErrorText: React.FC<{message?: string}> = ({ message }) => {
+const ErrorText: React.FC<{ message?: string }> = ({ message }) => {
   return (
     <div className="text-red-500 text-sm">{message}</div>
   )
@@ -63,9 +67,10 @@ export function LoginForm({
 }: React.ComponentPropsWithoutRef<"div">) {
   const router = useRouter()
   const [selectedTab, setSelectedTab] = useState("login")
+  const [loading, setLoading] = useState(false);
 
   const [loginValues, setLoginValues] = useState<LoginFormValues>({ email: "", password: "" })
-  const [registerValues, setRegisterValues] = useState<RegisterFormValues>({ email: "", password: "" })
+  const [registerValues, setRegisterValues] = useState<RegisterFormValues>({ email: "", password: "", name: "" })
 
   const [loginErrors, setLoginErrors] = useState<FormErrors>({})
   const [registerErrors, setRegisterErrors] = useState<FormErrors>({})
@@ -104,26 +109,47 @@ export function LoginForm({
     }
   }
 
-  const handleLoginSubmit = async (event: React.FormEvent) => {
-    event.preventDefault()
-    if (validateLogin(loginValues)) {
-      console.log("Login bem-sucedido:", loginValues)
-      // Adicione a lógica de login (ex: chamada API)
-      await setAuthToken('Token Fake')
-      router.push("/");
-    }
-  }
 
-  const handleRegisterSubmit = (event: React.FormEvent) => {
+  const handleLoginSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+    if (await validateLogin(loginValues)) {
+      setLoading(true);
+      try {
+        const response = await signInWithFirebase(loginValues.email, loginValues.password);
+        const token = await response.getIdToken();
+        await setAuthToken(token);
+        router.push('/');
+      } catch (error) {
+        console.error('Erro ao fazer login:', error);
+        // Aqui você pode mostrar um erro para o usuário (como uma notificação ou mensagem na UI)
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+
+  const handleRegisterSubmit = async (event: React.FormEvent) => {
     event.preventDefault()
-    if (validateRegister(registerValues)) {
-      console.log("Registro bem-sucedido:", registerValues)
-      // Adicione a lógica de registro (ex: chamada API)
-      setRegisterValues({ email: "", password: "" })
-      toast.success("Registro bem sucedido!", {
-        duration: 2000,
-      })
-      setSelectedTab("login")
+    if (await validateRegister(registerValues)) {
+      try {
+        const response = await registerUser(
+          registerValues.name,
+          registerValues.email,
+          registerValues.password
+        );
+
+        toast.success("Registro bem-sucedido!", { duration: 2000 });
+
+        await setAuthToken(response.token);
+        router.push('/');
+
+      } catch (error) {
+        if (error instanceof Error) {
+          toast.error(error.message, { duration: 3000 });
+        } else {
+          toast.error("Erro desconhecido ao registrar", { duration: 3000 });
+        }
+      }
     }
   }
 
@@ -153,7 +179,7 @@ export function LoginForm({
                     onChange={(e) => setLoginValues({ ...loginValues, email: e.target.value })}
                     className={loginErrors.email ? "border-red-500" : ""}
                   />
-                  {loginErrors.email && <ErrorText message={loginErrors.email}/>}
+                  {loginErrors.email && <ErrorText message={loginErrors.email} />}
                 </div>
                 <div className="space-y-1">
                   <Label htmlFor="password">Senha</Label>
@@ -164,11 +190,13 @@ export function LoginForm({
                     onChange={(e) => setLoginValues({ ...loginValues, password: e.target.value })}
                     className={loginErrors.password ? "border-red-500" : ""}
                   />
-                  {loginErrors.email && <ErrorText message={loginErrors.password}/>}
+                  {loginErrors.email && <ErrorText message={loginErrors.password} />}
                 </div>
               </CardContent>
               <CardFooter>
-                <Button type="submit">Login</Button>
+                <Button type="submit" disabled={loading}>
+                  {loading ? <Spinner size="medium" /> : "Login"}
+                </Button>
               </CardFooter>
             </form>
           </Card>
@@ -183,6 +211,17 @@ export function LoginForm({
             </CardHeader>
             <form onSubmit={handleRegisterSubmit} className="space-y-2">
               <CardContent className="space-y-2">
+                <div className="space-y-1">
+                  <Label htmlFor="name-register">Nome</Label>
+                  <Input
+                    id="name-register"
+                    type="text"
+                    value={registerValues.name}
+                    onChange={(e) => setRegisterValues({ ...registerValues, name: e.target.value })}
+                    className={registerErrors.name ? "border-red-500" : ""}
+                  />
+                  <ErrorText message={registerErrors.name} />
+                </div>
                 <div className="space-y-1">
                   <Label htmlFor="email-register">Email</Label>
                   <Input
@@ -207,7 +246,9 @@ export function LoginForm({
                 </div>
               </CardContent>
               <CardFooter>
-                <Button type="submit">Criar conta</Button>
+                <Button type="submit" disabled={loading}>
+                  {loading ? <Spinner size="medium" /> : "Criar conta"}
+                </Button>
               </CardFooter>
             </form>
           </Card>
