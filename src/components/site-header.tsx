@@ -4,9 +4,17 @@ import { useRouter } from "next/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Button } from "./ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu";
+import { signOutFirebase } from "@/lib/auth/auth";
+import { removeAuthToken } from "@/lib/auth/authCookies";
 
 export function SiteHeader() {
   const router = useRouter()
+
+  const handleSignOut = async () => {
+    await signOutFirebase()
+    await removeAuthToken()
+    router.push('/sign-in')
+  }
   
   return (
     <header className="group-has-data-[collapsible=icon]/sidebar-wrapper:h-12 flex h-12 shrink-0 items-center gap-2 border-b transition-[width,height] ease-linear">
@@ -22,7 +30,7 @@ export function SiteHeader() {
               </Avatar>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
-              <DropdownMenuItem>Sair</DropdownMenuItem>
+              <DropdownMenuItem onClick={handleSignOut}>Sair</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>

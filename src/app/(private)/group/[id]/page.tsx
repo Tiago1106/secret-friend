@@ -14,7 +14,7 @@ import {
   TableRow,
 } from "@/components/ui/table"
 
-import { useGroupForId } from "@/helpers/groups/fetchGroupForId";
+import { useGroupForId } from "@/lib/groups/fetchGroupForId";
 
 interface GroupPageProps {
   params: Promise<{ id: string }>
