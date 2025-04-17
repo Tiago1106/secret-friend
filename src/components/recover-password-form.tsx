@@ -117,7 +117,7 @@ export function RecoverPasswordForm({
             <Button type="submit" disabled={loading}>
               {loading ? <Spinner size="medium" /> : "Enviar"}
             </Button>
-            <Button onClick={() => router.push('/sign-in')}>Voltar</Button>
+            <Button onClick={() => router.push('/sign-in')} variant={'outline'}>Voltar</Button>
           </CardFooter>
         </form>
       </Card>

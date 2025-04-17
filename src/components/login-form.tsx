@@ -29,6 +29,7 @@ import { useRouter } from "next/navigation"
 import { signInWithFirebase } from "@/lib/auth/auth"
 import { Spinner } from "./ui/spinner"
 import { registerUser } from "@/lib/auth/register"
+import Link from "next/link"
 const loginSchema = z.object({
   email: z.string().email("Email inválido").nonempty("Email é obrigatório"),
   password: z.string().nonempty("Senha é obrigatória"),
@@ -191,6 +192,9 @@ export function LoginForm({
                     className={loginErrors.password ? "border-red-500" : ""}
                   />
                   {loginErrors.email && <ErrorText message={loginErrors.password} />}
+                </div>
+                <div className="space-y-1">
+                  <Link href="/recover-password" className="text-sm">Esqueceu sua senha?</Link>
                 </div>
               </CardContent>
               <CardFooter>
