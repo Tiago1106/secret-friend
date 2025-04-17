@@ -2,6 +2,7 @@ import { MiddlewareConfig, NextRequest, NextResponse } from "next/server";
 
 export const publicRoutes = [
   {path: '/sign-in', whenAuthenticated: 'redirect'},
+  {path: '/recover-password', whenAuthenticated: 'next'},
   // {path: '/pricing', whenAuthenticated: 'next'} // ROTA QUE ELE PODE ACESSAR MESMO ESTANDO LOGADO 
 ] as const;
 
