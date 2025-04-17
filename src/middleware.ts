@@ -2,6 +2,7 @@ import { MiddlewareConfig, NextRequest, NextResponse } from "next/server";
 
 export const publicRoutes = [
   {path: '/sign-in', whenAuthenticated: 'redirect'},
+  {path: '/recover-password', whenAuthenticated: 'next'},
   // {path: '/pricing', whenAuthenticated: 'next'} // ROTA QUE ELE PODE ACESSAR MESMO ESTANDO LOGADO 
 ] as const;
 
@@ -32,9 +33,18 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(redirectUrl);
   }
 
-  if(authToken && !publicRoute) {
-    // Checar se o JWT está EXPIRADO
-    // Se sim, remover o cookie e redirecionar o usuário pro /sign-in
+  if (authToken && !publicRoute) {
+    const payload = JSON.parse(
+      Buffer.from(authToken.value.split('.')[1], 'base64').toString()
+    );
+
+    const currentTime = Math.floor(Date.now() / 1000);
+
+    if (payload.exp < currentTime) {
+      const response = NextResponse.redirect(new URL('/sign-in', request.url));
+      response.cookies.delete('token');
+      return response;
+    }
 
     return NextResponse.next();
   }

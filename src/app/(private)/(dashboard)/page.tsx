@@ -2,7 +2,7 @@
 
 import { CustomCard } from "@/components/custom-cart";
 import { Button } from "@/components/ui/button";
-import { useGroups } from "@/helpers/groups/fetchGroups";
+import { useGroups } from "@/lib/groups/fetchGroups";
 import { useRouter } from "next/navigation";
 
 export default function Dashboard() {

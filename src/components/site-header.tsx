@@ -1,12 +1,23 @@
 'use client'
 
 import { useRouter } from "next/navigation";
-import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import { Avatar, AvatarFallback } from "./ui/avatar";
 import { Button } from "./ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu";
+import { signOutFirebase } from "@/lib/auth/auth";
+import { removeAuthToken } from "@/lib/auth/authCookies";
+import { auth } from "@/lib/firebaseConfig";
 
 export function SiteHeader() {
   const router = useRouter()
+
+  const user = auth.currentUser;
+
+  const handleSignOut = async () => {
+    await signOutFirebase()
+    await removeAuthToken()
+    router.push('/sign-in')
+  }
   
   return (
     <header className="group-has-data-[collapsible=icon]/sidebar-wrapper:h-12 flex h-12 shrink-0 items-center gap-2 border-b transition-[width,height] ease-linear">
@@ -17,12 +28,11 @@ export function SiteHeader() {
           <DropdownMenu>
             <DropdownMenuTrigger>
               <Avatar className="cursor-pointer">
-                <AvatarImage src="https://github.com/shadcn.png" />
-                <AvatarFallback>CN</AvatarFallback>
+                <AvatarFallback>{user?.displayName?.charAt(0)}</AvatarFallback>
               </Avatar>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
-              <DropdownMenuItem>Sair</DropdownMenuItem>
+              <DropdownMenuItem onClick={handleSignOut}>Sair</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>

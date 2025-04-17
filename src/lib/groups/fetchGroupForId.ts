@@ -1,6 +1,6 @@
 "use client";
 
-// import api from "../api";
+// import api from "@/helpers/api";
 import { useQuery } from '@tanstack/react-query';
 
 const MOCK_GROUP = {
