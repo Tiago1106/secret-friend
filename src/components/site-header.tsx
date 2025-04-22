@@ -6,12 +6,12 @@ import { Button } from "./ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu";
 import { signOutFirebase } from "@/lib/auth/auth";
 import { removeAuthToken } from "@/lib/auth/authCookies";
-import { auth } from "@/lib/firebaseConfig";
+import { useAuthStore } from "@/stores/useAuthStore";
 
 export function SiteHeader() {
   const router = useRouter()
 
-  const user = auth.currentUser;
+  const user = useAuthStore((state) => state.user)
 
   const handleSignOut = async () => {
     await signOutFirebase()
