@@ -2,7 +2,7 @@
 
 import { CustomCard } from "@/components/custom-cart";
 import { Button } from "@/components/ui/button";
-import { useGroups } from "@/lib/groups/fetchGroups";
+import { useGroups } from "@/lib/queries/groups/useGroups";
 import { useRouter } from "next/navigation";
 
 export default function Dashboard() {
@@ -31,9 +31,9 @@ export default function Dashboard() {
         md:grid-cols-2 
         lg:grid-cols-3
         xl:grid-cols-4">
-        {data?.map((item) => (
+        {/* {data?.map((item) => (
           <CustomCard key={item.id} id={item.id} date={item.date} participants={item.participants} title={item.title} onClick={handleClickGroup}/>
-        ))}
+        ))} */}
       </div>
     </div>
   );

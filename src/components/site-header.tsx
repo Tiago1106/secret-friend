@@ -4,8 +4,8 @@ import { useRouter } from "next/navigation";
 import { Avatar, AvatarFallback } from "./ui/avatar";
 import { Button } from "./ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu";
-import { signOutFirebase } from "@/lib/auth/auth";
-import { removeAuthToken } from "@/lib/auth/authCookies";
+import { signOutFirebase } from "@/lib/queries/auth/auth";
+import { removeAuthToken } from "@/lib/queries/auth/authCookies";
 import { useAuthStore } from "@/stores/useAuthStore";
 
 export function SiteHeader() {

@@ -13,6 +13,11 @@ import { useState } from "react";
 import { z } from "zod";
 import { format } from "date-fns"
 import { ptBR } from "date-fns/locale";
+import { useAuthStore } from "@/stores/useAuthStore";
+import { toast } from "sonner";
+import { useCreateGroup } from "@/lib/queries/groups/useCreateGroup";
+import { shuffleArray } from "@/utils/shuffleArray";
+import { useRouter } from "next/navigation";
 
 type Participants = {
   name: string;
@@ -25,6 +30,10 @@ const participantSchema = z.object({
 });
 
 export default function NewGroup() {
+  const router = useRouter();
+  const user = useAuthStore((state) => state.user)
+  const { mutateAsync: createGroup } = useCreateGroup();
+
   const [groupName, setGroupName] = useState<string>('')
   const [groupDate, setGroupDate] = useState<Date>();
   const [participants, setParticipants] = useState<Participants[]>([{ name: "", email: "" }]);
@@ -54,15 +63,14 @@ export default function NewGroup() {
     }));
   };
 
-  const handleCreateGroup = () => {
+  const handleCreateGroup = async () => {
     let hasError = false;
     const newErrors: Record<number, { name?: string; email?: string }> = {};
-
-    // Remove participantes vazios antes da validação
+  
     const nonEmptyParticipants = participants.filter(
-      (p) => p.name.trim() !== "" || p.email.trim() !== ""
+      (p) => p.name.trim() !== '' || p.email.trim() !== ''
     );
-
+  
     const validParticipants = nonEmptyParticipants.filter((p, index) => {
       const result = participantSchema.safeParse(p);
       if (!result.success) {
@@ -74,16 +82,51 @@ export default function NewGroup() {
       }
       return result.success;
     });
-
+  
     setErrors(newErrors);
-
+  
     if (hasError) {
-      console.error("Existem participantes inválidos.");
+      console.error('Participantes inválidos.');
       return;
     }
-
-    console.log("Grupo", groupName, "criado com:", validParticipants);
-    // setParticipants(validParticipants); // Atualiza a lista apenas com participantes válidos
+  
+    if (!user) {
+      toast.error("Você precisa estar logado para criar um grupo.");
+      return;
+    }
+  
+    if (!groupDate) {
+      toast.error("Selecione a data do amigo secreto.");
+      return;
+    }
+  
+    if (validParticipants.length < 2) {
+      toast.error("Você precisa de pelo menos 2 participantes.");
+      return;
+    }
+  
+    try {
+      const shuffled = shuffleArray([...validParticipants]);
+      const pairs = shuffled.map((giver, index) => ({
+        giver,
+        receiver: shuffled[(index + 1) % shuffled.length],
+      }));
+  
+      const docRef = await createGroup({
+        name: groupName,
+        date: groupDate.toISOString(),
+        participants: validParticipants,
+        ownerId: user.uid,
+        pairs,
+      });
+  
+      toast.success('Grupo criado com sucesso!');
+      // opcional: resetar campos
+      router.push(`/group/${docRef.id}`)
+    } catch (err) {
+      console.error('Erro ao criar grupo:', err);
+      toast.error('Erro ao criar grupo.');
+    }
   };
 
   return (

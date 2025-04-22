@@ -20,7 +20,7 @@ import { z } from "zod"
 import { ZodError } from "zod"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { recoverPassword } from "@/lib/auth/recoverPassword"
+import { recoverPassword } from "@/lib/queries/auth/recoverPassword"
 
 const recoverPasswordSchema = z.object({
   email: z.string().email("Email inválido").nonempty("Email é obrigatório"),
