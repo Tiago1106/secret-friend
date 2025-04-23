@@ -113,7 +113,7 @@ export default function NewGroup() {
       });
   
       toast.success('Grupo criado com sucesso!');
-      router.push(`/group/${id}`);
+      router.replace(`/group/${id}`);
     } catch (err) {
       console.error('Erro ao criar grupo:', err);
       toast.error('Erro ao criar grupo.');

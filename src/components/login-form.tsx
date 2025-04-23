@@ -119,10 +119,9 @@ export function LoginForm({
         const response = await signInWithFirebase(loginValues.email, loginValues.password);
         const token = await response.getIdToken();
         await setAuthToken(token);
-        router.push('/');
+        router.replace('/');
       } catch (error) {
         console.error('Erro ao fazer login:', error);
-        // Aqui você pode mostrar um erro para o usuário (como uma notificação ou mensagem na UI)
       } finally {
         setLoading(false);
       }
@@ -142,7 +141,7 @@ export function LoginForm({
         toast.success("Registro bem-sucedido!", { duration: 2000 });
 
         await setAuthToken(response.token);
-        router.push('/');
+        router.replace('/');
 
       } catch (error) {
         if (error instanceof Error) {

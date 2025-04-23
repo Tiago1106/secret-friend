@@ -77,7 +77,7 @@ export function RecoverPasswordForm({
       try {
         const message = await recoverPassword(recoverPasswordValue.email);
         toast.success(message, { duration: 2000 });
-        router.push('/sign-in')
+        router.replace('/sign-in')
       } catch (err) {
         if (err instanceof Error) {
           toast.error(err.message, { duration: 3000 });
@@ -117,7 +117,7 @@ export function RecoverPasswordForm({
             <Button type="submit" disabled={loading}>
               {loading ? <Spinner size="medium" /> : "Enviar"}
             </Button>
-            <Button onClick={() => router.push('/sign-in')} variant={'outline'}>Voltar</Button>
+            <Button onClick={() => router.replace('/sign-in')} variant={'outline'}>Voltar</Button>
           </CardFooter>
         </form>
       </Card>

@@ -18,7 +18,7 @@ export default function Dashboard() {
   if (isError) return <p>Erro ao carregar grupos</p>;
 
   const handleClickGroup = (id: string) => {
-    router.push(`group/${id}`);
+    router.replace(`group/${id}`);
   };
 
   const handleDelete = (id: string) => {
@@ -29,7 +29,7 @@ export default function Dashboard() {
     <div className="flex flex-col gap-5">
       <div className="flex flex-row items-center justify-between">
         <h1 className="font-medium text-2xl">Meus Grupos</h1>
-        <Button variant="secondary" onClick={() => router.push("new-group")}>
+        <Button variant="secondary" onClick={() => router.replace("new-group")}>
           Novo Grupo
         </Button>
       </div>
