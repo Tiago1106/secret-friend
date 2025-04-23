@@ -4,19 +4,19 @@ import { useRouter } from "next/navigation";
 import { Avatar, AvatarFallback } from "./ui/avatar";
 import { Button } from "./ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu";
-import { signOutFirebase } from "@/lib/auth/auth";
-import { removeAuthToken } from "@/lib/auth/authCookies";
-import { auth } from "@/lib/firebaseConfig";
+import { signOutFirebase } from "@/lib/queries/auth/auth";
+import { removeAuthToken } from "@/lib/queries/auth/authCookies";
+import { useAuthStore } from "@/stores/useAuthStore";
 
 export function SiteHeader() {
   const router = useRouter()
 
-  const user = auth.currentUser;
+  const user = useAuthStore((state) => state.user)
 
   const handleSignOut = async () => {
     await signOutFirebase()
     await removeAuthToken()
-    router.push('/sign-in')
+    router.replace('/sign-in')
   }
   
   return (
@@ -24,7 +24,7 @@ export function SiteHeader() {
       <div className="flex w-full items-center gap-1 px-4 lg:gap-2 lg:px-6 justify-between">
         <h1 className="text-base font-medium">Amigo Secreto</h1>
         <div className="flex flex-row gap-3">
-          <Button variant="outline" onClick={() => router.push('/')}>Meus Grupos</Button>
+          <Button variant="outline" onClick={() => router.replace('/')}>Meus Grupos</Button>
           <DropdownMenu>
             <DropdownMenuTrigger>
               <Avatar className="cursor-pointer">

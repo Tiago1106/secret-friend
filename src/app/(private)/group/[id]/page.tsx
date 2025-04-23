@@ -1,21 +1,13 @@
-"use client";
+'use client'
 
 import { use, useState } from "react";
 import { Calendar, Users } from "lucide-react";
-
+import { useGroupForId } from "@/lib/queries/groups/useGroupId";
+import { useAuthStore } from "@/stores/useAuthStore";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
-
-import { useGroupForId } from "@/lib/groups/fetchGroupForId";
-
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { format } from "date-fns";
 interface GroupPageProps {
   params: Promise<{ id: string }>
 }
@@ -23,18 +15,20 @@ interface GroupPageProps {
 export default function Group({ params }: GroupPageProps) {
   const { id } = use(params)
   const [revelate, setRevelate] = useState(false)
-  const [loadingRevalate, setLoadingRevelate] = useState(false);
+  const [loadingRevalate, setLoadingRevelate] = useState(false)
 
   const { data, isLoading, isError } = useGroupForId(id)
+  const user = useAuthStore((state) => state.user)
 
-  if (isLoading) return <p>Carregando...</p>;
-  if (isError) return <p>Erro ao carregar grupos</p>;
+  if (isLoading) return <p>Carregando...</p>
+  if (isError) return <p>Erro ao carregar grupo</p>
+  if (!data || !user) return null
+
+  const currentPair = data.pairs?.find(pair => pair.giver.email === user.email)
 
   const handleRevalete = () => {
     if (revelate || loadingRevalate) return
-
     setLoadingRevelate(true)
-
     setTimeout(() => {
       setLoadingRevelate(false)
       setRevelate(true)
@@ -48,14 +42,16 @@ export default function Group({ params }: GroupPageProps) {
           <CardTitle>{data?.title}</CardTitle>
           <CardDescription className="flex flex-row items-center gap-2">
             <Calendar size={14} />
-            {data?.date}
+            {format(new Date(data?.date), 'dd/MM/yyyy')}
           </CardDescription>
           <CardDescription className="flex flex-row items-center gap-2">
             <Users size={14} />
             {data?.participants.length} Participantes
           </CardDescription>
         </CardHeader>
+
         <Separator />
+
         <CardContent className="flex flex-row justify-between items-center">
           <div
             className="w-full h-32 bg-muted rounded-md items-center justify-center flex flex-col cursor-pointer transition-all duration-300"
@@ -64,22 +60,24 @@ export default function Group({ params }: GroupPageProps) {
             {loadingRevalate ? (
               <>
                 <CardTitle>⏳ Revelando...</CardTitle>
-                <CardDescription>Espere só um pouquinho</CardDescription>
+                <CardDescription>Tirando os papeizinhos...</CardDescription>
               </>
             ) : revelate ? (
               <>
-                <CardTitle>🤫 {data?.yourSecret}</CardTitle>
-                <CardDescription>Não conte pra ninguém!</CardDescription>
+                <CardTitle>🤫 {currentPair?.receiver.name}</CardTitle>
+                <CardDescription>🎁 Agora é com você! Presentes em breve.</CardDescription>
               </>
             ) : (
               <>
-                <CardTitle>Seu amigo secreto</CardTitle>
+                <CardTitle>Preparado para saber?</CardTitle>
                 <CardDescription>Clique para revelar</CardDescription>
               </>
             )}
           </div>
         </CardContent>
+
         <Separator />
+
         <CardContent className="gap-5 flex flex-col">
           <CardTitle>Participantes</CardTitle>
           <Table>
@@ -100,6 +98,6 @@ export default function Group({ params }: GroupPageProps) {
           </Table>
         </CardContent>
       </Card>
-    </div >
+    </div>
   );
 }

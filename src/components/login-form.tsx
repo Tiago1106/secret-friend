@@ -24,11 +24,11 @@ import { toast } from "sonner";
 import { z } from "zod"
 import { ZodError } from "zod"
 import { useState } from "react"
-import { setAuthToken } from "@/lib/auth/authCookies"
+import { setAuthToken } from "@/lib/queries/auth/authCookies"
 import { useRouter } from "next/navigation"
-import { signInWithFirebase } from "@/lib/auth/auth"
+import { signInWithFirebase } from "@/lib/queries/auth/auth"
 import { Spinner } from "./ui/spinner"
-import { registerUser } from "@/lib/auth/register"
+import { registerUser } from "@/lib/queries/auth/register"
 import Link from "next/link"
 const loginSchema = z.object({
   email: z.string().email("Email inválido").nonempty("Email é obrigatório"),
@@ -119,10 +119,9 @@ export function LoginForm({
         const response = await signInWithFirebase(loginValues.email, loginValues.password);
         const token = await response.getIdToken();
         await setAuthToken(token);
-        router.push('/');
+        router.replace('/');
       } catch (error) {
         console.error('Erro ao fazer login:', error);
-        // Aqui você pode mostrar um erro para o usuário (como uma notificação ou mensagem na UI)
       } finally {
         setLoading(false);
       }
@@ -142,7 +141,7 @@ export function LoginForm({
         toast.success("Registro bem-sucedido!", { duration: 2000 });
 
         await setAuthToken(response.token);
-        router.push('/');
+        router.replace('/');
 
       } catch (error) {
         if (error instanceof Error) {
