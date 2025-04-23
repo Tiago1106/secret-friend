@@ -7,7 +7,7 @@ import { useAuthStore } from "@/stores/useAuthStore";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-
+import { format } from "date-fns";
 interface GroupPageProps {
   params: Promise<{ id: string }>
 }
@@ -42,7 +42,7 @@ export default function Group({ params }: GroupPageProps) {
           <CardTitle>{data?.title}</CardTitle>
           <CardDescription className="flex flex-row items-center gap-2">
             <Calendar size={14} />
-            {data?.date}
+            {format(new Date(data?.date), 'dd/MM/yyyy')}
           </CardDescription>
           <CardDescription className="flex flex-row items-center gap-2">
             <Users size={14} />

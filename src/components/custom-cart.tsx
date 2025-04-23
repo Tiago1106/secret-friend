@@ -11,6 +11,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { format } from "date-fns";
 
 interface CustomCardProps {
   title: string;
@@ -61,7 +62,7 @@ export function CustomCard({ title, date, participants, id, onClick, onDelete }:
         <CardTitle>{title}</CardTitle>
         <CardDescription className="flex flex-row items-center gap-2">
           <Calendar size={14} />
-          {date}
+          {format(new Date(date), 'dd/MM/yyyy')}
         </CardDescription>
         <CardDescription className="flex flex-row items-center gap-2">
           <Users size={14} />
