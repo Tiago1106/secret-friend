@@ -1,27 +1,18 @@
-import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
-import { db } from '@/lib/firebaseConfig';
+import api from '@/helpers/api';
+import { GroupFormValues } from '@/types/group';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { GroupFormValues, Participant } from '@/types/group';
 
-export const createGroup = async (
-  data: GroupFormValues & { ownerId: string; pairs: { giver: Participant; receiver: Participant }[] }
-) => {
-  const docRef = await addDoc(collection(db, 'groups'), {
-    name: data.name,
-    date: data.date,
-    participants: data.participants,
-    ownerId: data.ownerId,
-    pairs: data.pairs, // <-- adiciona os pares aqui
-    createdAt: serverTimestamp(),
-  });
-  return docRef;
+export const createGroup = async (data: GroupFormValues & { ownerId: string }) => {
+  const res = await api.post('groups/create', { json: data }).json<{ id: string }>();
+  return res;
 };
+
 
 export const useCreateGroup = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: createGroup,
+    mutationFn: (data: GroupFormValues & { ownerId: string }) => createGroup(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['groups'] });
     },

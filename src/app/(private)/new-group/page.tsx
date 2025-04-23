@@ -16,7 +16,6 @@ import { ptBR } from "date-fns/locale";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { toast } from "sonner";
 import { useCreateGroup } from "@/lib/queries/groups/useCreateGroup";
-import { shuffleArray } from "@/utils/shuffleArray";
 import { useRouter } from "next/navigation";
 
 type Participants = {
@@ -32,7 +31,7 @@ const participantSchema = z.object({
 export default function NewGroup() {
   const router = useRouter();
   const user = useAuthStore((state) => state.user)
-  const { mutateAsync: createGroup } = useCreateGroup();
+  const createGroupMutation = useCreateGroup();
 
   const [groupName, setGroupName] = useState<string>('')
   const [groupDate, setGroupDate] = useState<Date>();
@@ -106,23 +105,15 @@ export default function NewGroup() {
     }
   
     try {
-      const shuffled = shuffleArray([...validParticipants]);
-      const pairs = shuffled.map((giver, index) => ({
-        giver,
-        receiver: shuffled[(index + 1) % shuffled.length],
-      }));
-  
-      const docRef = await createGroup({
+      const { id } = await createGroupMutation.mutateAsync({
         name: groupName,
         date: groupDate.toISOString(),
         participants: validParticipants,
         ownerId: user.uid,
-        pairs,
       });
   
       toast.success('Grupo criado com sucesso!');
-      // opcional: resetar campos
-      router.push(`/group/${docRef.id}`)
+      router.push(`/group/${id}`);
     } catch (err) {
       console.error('Erro ao criar grupo:', err);
       toast.error('Erro ao criar grupo.');
