@@ -16,7 +16,7 @@ import { ptBR } from "date-fns/locale";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { toast } from "sonner";
 import { useCreateGroup } from "@/lib/queries/groups/useCreateGroup";
-import { useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";  
 
 type Participants = {
   name: string;
