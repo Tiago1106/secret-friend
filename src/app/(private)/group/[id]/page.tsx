@@ -60,16 +60,16 @@ export default function Group({ params }: GroupPageProps) {
             {loadingRevalate ? (
               <>
                 <CardTitle>⏳ Revelando...</CardTitle>
-                <CardDescription>Espere só um pouquinho</CardDescription>
+                <CardDescription>Tirando os papeizinhos...</CardDescription>
               </>
             ) : revelate ? (
               <>
                 <CardTitle>🤫 {currentPair?.receiver.name}</CardTitle>
-                <CardDescription>Não conte pra ninguém!</CardDescription>
+                <CardDescription>🎁 Agora é com você! Presentes em breve.</CardDescription>
               </>
             ) : (
               <>
-                <CardTitle>Seu amigo secreto</CardTitle>
+                <CardTitle>Preparado para saber?</CardTitle>
                 <CardDescription>Clique para revelar</CardDescription>
               </>
             )}
